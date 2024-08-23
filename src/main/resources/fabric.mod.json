@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "breed-more-mobs",
+	"version": "${version}",
+	"name": "Breed More Mobs",
+	"description": "Tame and breed more mobs than in vanilla",
+	"authors": [
+		"KGriffon"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/breed-more-mobs",
+		"sources": "https://github.com/kgriff0n/breed-more-mobs"
+	},
+	"license": "MIT",
+	"icon": "assets/breed-more-mobs/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.kgriff0n.BreedMoreMobs"
+		]
+	},
+	"mixins": [
+		"breed-more-mobs.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": ">=1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "io.github.kgriff0n.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ParrotEntityMixin",
+    "PolarBearEntityMixin",
+    "SitOnOwnerShoulderGoalMixin",
+    "SkeletonHorseEntityMixin",
+    "ZombieHorseEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}
