@@ -73,7 +73,7 @@ public abstract class PolarBearEntityMixin extends AnimalEntity implements Anger
 	@Inject(method = "tick", at = @At("HEAD"))
 	private void grown(CallbackInfo ci) {
 		if (this.happyTicksRemaining > 0) {
-			if (this.happyTicksRemaining % 4 == 0) {
+			if (this.happyTicksRemaining % 4 == 0 && !this.getWorld().isClient()) {
 				((ServerWorld)this.getWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
 			}
 

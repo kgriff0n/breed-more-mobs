@@ -67,11 +67,9 @@ public abstract class ParrotEntityMixin extends TameableShoulderEntity implement
 	private void createChild(ServerWorld world, PassiveEntity entity, CallbackInfoReturnable<PassiveEntity> cir) {
 		ParrotEntity parrotEntity = new ParrotEntity(EntityType.PARROT, world);
 		parrotEntity.setVariant(this.getVariant());
-		if (this.isTamed()) {
-			parrotEntity.setOwnerUuid(this.getOwnerUuid());
-			parrotEntity.setTamed(true, true);
-			parrotEntity.getAttributeInstance(EntityAttributes.GENERIC_SCALE).setBaseValue(0.5f);
-		}
+		parrotEntity.setOwnerUuid(this.getOwnerUuid());
+		parrotEntity.setTamed(true, true);
+		parrotEntity.getAttributeInstance(EntityAttributes.GENERIC_SCALE).setBaseValue(0.5f);
 		cir.setReturnValue(parrotEntity);
 	}
 
@@ -80,7 +78,6 @@ public abstract class ParrotEntityMixin extends TameableShoulderEntity implement
 		cir.setReturnValue(this.getBreedingAge() < 0);
 	}
 
-	// Modify the conditions under which a parrot can breed another parrot - almost identical to the code found in WolfEntity.java
 	@Inject(method = "canBreedWith", at = @At("HEAD"), cancellable = true)
 	private void canBreedWith(AnimalEntity other, CallbackInfoReturnable<Boolean> cir) {
 		if (other == this) {
@@ -99,13 +96,13 @@ public abstract class ParrotEntityMixin extends TameableShoulderEntity implement
 	@Inject(method = "tickMovement", at = @At("HEAD"))
 	private void grown(CallbackInfo ci) {
 		if (this.happyTicksRemaining > 0) {
-			if (this.happyTicksRemaining % 4 == 0) {
+			if (this.happyTicksRemaining % 4 == 0 && !this.getWorld().isClient()) {
 				((ServerWorld)this.getWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
 			}
 
 			this.happyTicksRemaining--;
 		}
-		if (this.getBreedingAge() == -1) {
+		if (this.getBreedingAge() == -1 && !this.getWorld().isClient()) {
 			this.getAttributeInstance(EntityAttributes.GENERIC_SCALE).setBaseValue(1f);
 		}
 	}

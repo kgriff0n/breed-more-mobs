@@ -15,6 +15,6 @@ public class BreedMoreMobs implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Loaded");
+		LOGGER.info("Breed More Mobs loaded");
 	}
 }

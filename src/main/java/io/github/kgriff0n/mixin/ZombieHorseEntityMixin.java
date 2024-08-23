@@ -1,9 +1,11 @@
 package io.github.kgriff0n.mixin;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.SkeletonHorseEntity;
 import net.minecraft.entity.mob.ZombieHorseEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -77,10 +79,19 @@ public abstract class ZombieHorseEntityMixin extends AbstractHorseEntity {
 		}
 	}
 
+	@Inject(method = "createChild", at = @At("HEAD"), cancellable = true)
+	private void createChild(ServerWorld world, PassiveEntity entity, CallbackInfoReturnable<PassiveEntity> cir) {
+		ZombieHorseEntity zombieHorseEntity = new ZombieHorseEntity(EntityType.ZOMBIE_HORSE, world);
+		zombieHorseEntity.setOwnerUuid(this.getOwnerUuid());
+		zombieHorseEntity.setTame(true);
+		zombieHorseEntity.setBaby(true);
+		cir.setReturnValue(zombieHorseEntity);
+	}
+
 	@Override
 	public void tickMovement() {
 		if (this.happyTicksRemaining > 0) {
-			if (this.happyTicksRemaining % 4 == 0) {
+			if (this.happyTicksRemaining % 4 == 0 && !this.getWorld().isClient()) {
 				((ServerWorld)this.getWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
 			}
 			this.happyTicksRemaining--;
