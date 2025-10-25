@@ -35,29 +35,29 @@ public abstract class ZombieHorseEntityMixin extends AbstractHorseEntity {
 		if (!this.isTame()) {
 			if (itemStack.isOf(Items.AIR)) {
 				player.swingHand(hand);
-				player.startRiding(this, true);
+				player.startRiding(this, true, true);
 			} else {
 				this.playAngrySound();
 			}
-			cir.setReturnValue(ActionResult.success(this.getWorld().isClient));
+			cir.setReturnValue(ActionResult.SUCCESS_SERVER);
 		}
 
 		// Breed
 		if (this.isTame() && this.isBreedingItem(itemStack)) {
 			int i = this.getBreedingAge();
-			if (!this.getWorld().isClient && i == 0 && this.canEat()) {
+			if (!this.getEntityWorld().isClient() && i == 0 && this.canEat()) {
 				this.eat(player, hand, itemStack);
 				this.lovePlayer(player);
-				cir.setReturnValue(ActionResult.SUCCESS);
+				cir.setReturnValue(ActionResult.SUCCESS_SERVER);
 			}
 
 			if (this.isBaby()) {
 				this.eat(player, hand, itemStack);
 				this.growUp(toGrowUpAge(-i), true);
-				cir.setReturnValue(ActionResult.success(this.getWorld().isClient));
+				cir.setReturnValue(ActionResult.SUCCESS_SERVER);
 			}
 
-			if (this.getWorld().isClient) {
+			if (this.getEntityWorld().isClient()) {
 				cir.setReturnValue(ActionResult.CONSUME);
 			}
 		}
@@ -82,7 +82,7 @@ public abstract class ZombieHorseEntityMixin extends AbstractHorseEntity {
 	@Inject(method = "createChild", at = @At("HEAD"), cancellable = true)
 	private void createChild(ServerWorld world, PassiveEntity entity, CallbackInfoReturnable<PassiveEntity> cir) {
 		ZombieHorseEntity zombieHorseEntity = new ZombieHorseEntity(EntityType.ZOMBIE_HORSE, world);
-		zombieHorseEntity.setOwnerUuid(this.getOwnerUuid());
+		zombieHorseEntity.setOwner(this.getOwner());
 		zombieHorseEntity.setTame(true);
 		zombieHorseEntity.setBaby(true);
 		cir.setReturnValue(zombieHorseEntity);
@@ -91,8 +91,8 @@ public abstract class ZombieHorseEntityMixin extends AbstractHorseEntity {
 	@Override
 	public void tickMovement() {
 		if (this.happyTicksRemaining > 0) {
-			if (this.happyTicksRemaining % 4 == 0 && !this.getWorld().isClient()) {
-				((ServerWorld)this.getWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
+			if (this.happyTicksRemaining % 4 == 0 && !this.getEntityWorld().isClient()) {
+				((ServerWorld)this.getEntityWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
 			}
 			this.happyTicksRemaining--;
 		}

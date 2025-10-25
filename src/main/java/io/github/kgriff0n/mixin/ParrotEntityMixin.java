@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ParrotEntity.class)
-public abstract class ParrotEntityMixin extends TameableShoulderEntity implements VariantHolder<ParrotEntity.Variant>, Flutterer {
+public abstract class ParrotEntityMixin extends TameableShoulderEntity implements Flutterer {
 
 	protected ParrotEntityMixin(EntityType<? extends TameableShoulderEntity> entityType, World world) {
 		super(entityType, world);
@@ -38,19 +38,19 @@ public abstract class ParrotEntityMixin extends TameableShoulderEntity implement
 		ItemStack itemStack = player.getStackInHand(hand);
 		if (this.isTamed() && this.isBreedingItem(itemStack)) {
 			int i = this.getBreedingAge();
-			if (!this.getWorld().isClient && i == 0 && this.canEat()) {
+			if (!this.getEntityWorld().isClient() && i == 0 && this.canEat()) {
 				this.eat(player, hand, itemStack);
 				this.lovePlayer(player);
-				cir.setReturnValue(ActionResult.SUCCESS);
+				cir.setReturnValue(ActionResult.SUCCESS_SERVER);
 			}
 
 			if (this.isBaby()) {
 				this.eat(player, hand, itemStack);
 				this.growUp(toGrowUpAge(-i), true);
-				cir.setReturnValue(ActionResult.success(this.getWorld().isClient));
+				cir.setReturnValue(ActionResult.SUCCESS_SERVER);
 			}
 
-			if (this.getWorld().isClient) {
+			if (this.getEntityWorld().isClient()) {
 				cir.setReturnValue(ActionResult.CONSUME);
 			}
 		}
@@ -66,10 +66,9 @@ public abstract class ParrotEntityMixin extends TameableShoulderEntity implement
 	@Inject(method = "createChild", at = @At("HEAD"), cancellable = true)
 	private void createChild(ServerWorld world, PassiveEntity entity, CallbackInfoReturnable<PassiveEntity> cir) {
 		ParrotEntity parrotEntity = new ParrotEntity(EntityType.PARROT, world);
-		parrotEntity.setVariant(this.getVariant());
-		parrotEntity.setOwnerUuid(this.getOwnerUuid());
+		parrotEntity.setOwner(this.getOwner());
 		parrotEntity.setTamed(true, true);
-		parrotEntity.getAttributeInstance(EntityAttributes.GENERIC_SCALE).setBaseValue(0.5f);
+		parrotEntity.getAttributeInstance(EntityAttributes.SCALE).setBaseValue(0.5f);
 		cir.setReturnValue(parrotEntity);
 	}
 
@@ -96,14 +95,14 @@ public abstract class ParrotEntityMixin extends TameableShoulderEntity implement
 	@Inject(method = "tickMovement", at = @At("HEAD"))
 	private void grown(CallbackInfo ci) {
 		if (this.happyTicksRemaining > 0) {
-			if (this.happyTicksRemaining % 4 == 0 && !this.getWorld().isClient()) {
-				((ServerWorld)this.getWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
+			if (this.happyTicksRemaining % 4 == 0 && !this.getEntityWorld().isClient()) {
+				((ServerWorld)this.getEntityWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
 			}
 
 			this.happyTicksRemaining--;
 		}
-		if (this.getBreedingAge() == -1 && !this.getWorld().isClient()) {
-			this.getAttributeInstance(EntityAttributes.GENERIC_SCALE).setBaseValue(1f);
+		if (this.getBreedingAge() == -1 && !this.getEntityWorld().isClient()) {
+			this.getAttributeInstance(EntityAttributes.SCALE).setBaseValue(1f);
 		}
 	}
 

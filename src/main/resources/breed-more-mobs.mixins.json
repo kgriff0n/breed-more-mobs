@@ -3,6 +3,7 @@
   "package": "io.github.kgriff0n.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "HappyGhastEntityMixin",
     "ParrotEntityMixin",
     "PolarBearEntityMixin",
     "SitOnOwnerShoulderGoalMixin",

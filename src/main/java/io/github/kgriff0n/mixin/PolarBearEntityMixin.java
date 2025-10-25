@@ -35,19 +35,19 @@ public abstract class PolarBearEntityMixin extends AnimalEntity implements Anger
 		ItemStack itemStack = player.getStackInHand(hand);
 		if (this.isBreedingItem(itemStack)) {
 			int i = this.getBreedingAge();
-			if (!this.getWorld().isClient && i == 0 && this.canEat()) {
+			if (!this.getEntityWorld().isClient() && i == 0 && this.canEat()) {
 				this.eat(player, hand, itemStack);
 				this.lovePlayer(player);
-				return ActionResult.SUCCESS;
+				return ActionResult.SUCCESS_SERVER;
 			}
 
 			if (this.isBaby()) {
 				this.eat(player, hand, itemStack);
 				this.growUp(toGrowUpAge(-i), true);
-				return ActionResult.success(this.getWorld().isClient);
+				return ActionResult.SUCCESS_SERVER;
 			}
 
-			if (this.getWorld().isClient) {
+			if (this.getEntityWorld().isClient()) {
 				return ActionResult.CONSUME;
 			}
 		}
@@ -73,8 +73,8 @@ public abstract class PolarBearEntityMixin extends AnimalEntity implements Anger
 	@Inject(method = "tick", at = @At("HEAD"))
 	private void grown(CallbackInfo ci) {
 		if (this.happyTicksRemaining > 0) {
-			if (this.happyTicksRemaining % 4 == 0 && !this.getWorld().isClient()) {
-				((ServerWorld)this.getWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
+			if (this.happyTicksRemaining % 4 == 0 && !this.getEntityWorld().isClient()) {
+				((ServerWorld)this.getEntityWorld()).spawnParticles(ParticleTypes.HAPPY_VILLAGER, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), 1, 0, 0, 0, 0);
 			}
 
 			this.happyTicksRemaining--;
